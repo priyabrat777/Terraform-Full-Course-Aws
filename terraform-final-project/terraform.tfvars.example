@@ -1,0 +1,50 @@
+aws_region       = "us-east-1"
+secondary_region = "us-west-2"
+
+project_name = "terraform-final-project"
+environment  = "dev"
+owner        = "platform-engineering"
+cost_center  = "training"
+application  = "capstone"
+
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+private_subnet_cidrs = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+enable_nat_gateway   = true
+single_nat_gateway   = true
+enable_vpc_endpoints = true
+enable_secondary_vpc = false
+
+alb_ingress_cidr_blocks = ["0.0.0.0/0"]
+allowed_ssh_cidr_blocks = []
+
+instance_type          = "t3.micro"
+key_name               = null
+asg_min_size           = 2
+asg_desired_capacity   = 2
+asg_max_size           = 4
+bastion_instance_count = 0
+
+db_name                       = "appdb"
+db_username                   = "appadmin"
+db_instance_class             = "db.t4g.micro"
+db_allocated_storage          = 20
+enable_rds_deletion_protection = false
+
+alert_email        = ""
+enable_lambda      = true
+lambda_runtime     = "python3.12"
+lambda_timeout     = 30
+lambda_memory_size = 256
+log_retention_days = 14
+
+enable_cloudfront  = true
+enable_ecs_service = true
+container_image    = "public.ecr.aws/nginx/nginx:stable"
+ecs_desired_count  = 1
+enable_eks_cluster = false
+
+domain_name         = ""
+create_route53_zone = false
+create_dns_record   = false
