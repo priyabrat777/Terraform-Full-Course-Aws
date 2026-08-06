@@ -13,7 +13,7 @@ resource "aws_launch_template" "app" {
   user_data = base64encode(templatefile("${path.root}/scripts/user_data.sh", {
     app_name    = var.name_prefix
     environment = lookup(var.tags, "Environment", "unknown")
-    bucket_name  = var.app_bucket_name
+    bucket_name = var.app_bucket_name
   }))
 
   block_device_mappings {

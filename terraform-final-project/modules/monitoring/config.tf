@@ -22,12 +22,12 @@ resource "aws_iam_role_policy_attachment" "config" {
 
 data "aws_iam_policy_document" "config_bucket_access" {
   statement {
-    actions = ["s3:GetBucketAcl", "s3:ListBucket"]
+    actions   = ["s3:GetBucketAcl", "s3:ListBucket"]
     resources = [aws_s3_bucket.audit.arn]
   }
 
   statement {
-    actions = ["s3:PutObject"]
+    actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.audit.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/Config/*"]
   }
 }

@@ -36,23 +36,26 @@ terraform-final-project/
   main.tf                    # Root module composition
   outputs.tf                 # Root outputs
   terraform.tfvars.example   # Example environment values
-  network/                   # VPC, subnets, IGW, NAT, routes, NACL, SGs, endpoints, peering
-  loadbalancers/             # ALB, NLB, target groups, listeners
-  compute/                   # EC2, launch template, Auto Scaling
-  storage/                   # S3, CloudFront, EFS
-  database/                  # RDS and DynamoDB
-  iam/                       # IAM roles, policies, groups, optional users, instance profiles
-  kms/                       # KMS keys and aliases
-  secrets/                   # Secrets Manager, generated password, SSM parameters
-  serverless/                # Lambda, S3 notification, SQS
-  containers/                # ECR, ECS, optional EKS
-  monitoring/                # CloudWatch, SNS, CloudTrail, AWS Config
-  dns/                       # Optional Route53 zone and record
   resourcegroups.tf          # Tag-based AWS Resource Group
-  modules/remote-state-consumer/ # Example remote state consumer
+  modules/                   # Reusable infrastructure modules consumed by the root module
+    network/                 # VPC, subnets, IGW, NAT, routes, NACL, SGs, endpoints, peering
+    loadbalancers/           # ALB, NLB, target groups, listeners
+    compute/                 # EC2, launch template, Auto Scaling
+    storage/                 # S3, CloudFront, EFS
+    database/                # RDS and DynamoDB
+    iam/                     # IAM roles, policies, groups, optional users, instance profiles
+    kms/                     # KMS keys and aliases
+    secrets/                 # Secrets Manager, generated password, SSM parameters
+    serverless/              # Lambda, S3 notification, SQS
+    containers/              # ECR, ECS, optional EKS
+    monitoring/              # CloudWatch, SNS, CloudTrail, AWS Config
+    dns/                     # Optional Route53 zone and record
+    remote-state-consumer/   # Example remote state consumer
   examples/                  # Static site files and provisioner example
   scripts/                   # EC2 user data and Lambda source
 ```
+
+The root module intentionally remains a single deployment entry point for this project. The domain folders under `modules/` are packaged as reusable building blocks with explicit `variables.tf` inputs and `outputs.tf` contracts, so future root stacks can consume the same infrastructure components without copying resource definitions.
 
 ## Prerequisites
 

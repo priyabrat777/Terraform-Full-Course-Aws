@@ -31,7 +31,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         width  = 12
         height = 6
         properties = {
-          title = "ASG and RDS CPU"
+          title  = "ASG and RDS CPU"
           region = var.aws_region
           metrics = [
             ["AWS/AutoScaling", "GroupDesiredCapacity", "AutoScalingGroupName", var.autoscaling_group_name],

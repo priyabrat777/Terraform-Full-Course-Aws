@@ -18,16 +18,16 @@ locals {
 
   public_subnets = {
     for index, cidr in var.public_subnet_cidrs : "public-${index + 1}" => {
-      cidr = cidr
-      az   = local.selected_azs[index % length(local.selected_azs)]
+      cidr  = cidr
+      az    = local.selected_azs[index % length(local.selected_azs)]
       index = index
     }
   }
 
   private_subnets = {
     for index, cidr in var.private_subnet_cidrs : "private-${index + 1}" => {
-      cidr = cidr
-      az   = local.selected_azs[index % length(local.selected_azs)]
+      cidr  = cidr
+      az    = local.selected_azs[index % length(local.selected_azs)]
       index = index
     }
   }

@@ -1,46 +1,46 @@
 module "kms" {
-  source = "./kms"
+  source = "./modules/kms"
 
   name_prefix = local.name_prefix
   tags        = local.common_tags
 }
 
 module "network" {
-  source = "./network"
+  source = "./modules/network"
 
   providers = {
     aws           = aws
     aws.secondary = aws.dr
   }
 
-  name_prefix              = local.name_prefix
-  tags                     = local.common_tags
-  vpc_cidr                 = var.vpc_cidr
-  public_subnet_cidrs      = var.public_subnet_cidrs
-  private_subnet_cidrs     = var.private_subnet_cidrs
-  availability_zones       = var.availability_zones
-  enable_nat_gateway       = var.enable_nat_gateway
-  single_nat_gateway       = var.single_nat_gateway
-  enable_vpc_endpoints     = var.enable_vpc_endpoints
-  enable_secondary_vpc     = var.enable_secondary_vpc
-  secondary_vpc_cidr       = var.secondary_vpc_cidr
-  alb_ingress_cidr_blocks  = var.alb_ingress_cidr_blocks
-  allowed_ssh_cidr_blocks  = var.allowed_ssh_cidr_blocks
+  name_prefix             = local.name_prefix
+  tags                    = local.common_tags
+  vpc_cidr                = var.vpc_cidr
+  public_subnet_cidrs     = var.public_subnet_cidrs
+  private_subnet_cidrs    = var.private_subnet_cidrs
+  availability_zones      = var.availability_zones
+  enable_nat_gateway      = var.enable_nat_gateway
+  single_nat_gateway      = var.single_nat_gateway
+  enable_vpc_endpoints    = var.enable_vpc_endpoints
+  enable_secondary_vpc    = var.enable_secondary_vpc
+  secondary_vpc_cidr      = var.secondary_vpc_cidr
+  alb_ingress_cidr_blocks = var.alb_ingress_cidr_blocks
+  allowed_ssh_cidr_blocks = var.allowed_ssh_cidr_blocks
 }
 
 module "iam" {
-  source = "./iam"
+  source = "./modules/iam"
 
   name_prefix = local.name_prefix
   tags        = local.common_tags
 }
 
 module "secrets" {
-  source = "./secrets"
+  source = "./modules/secrets"
 
-  name_prefix     = local.name_prefix
-  db_username     = var.db_username
-  kms_key_arn     = module.kms.key_arns["secrets"]
+  name_prefix = local.name_prefix
+  db_username = var.db_username
+  kms_key_arn = module.kms.key_arns["secrets"]
   application_map = {
     environment = var.environment
     region      = var.aws_region
@@ -50,19 +50,19 @@ module "secrets" {
 }
 
 module "storage" {
-  source = "./storage"
+  source = "./modules/storage"
 
-  name_prefix       = local.name_prefix
-  kms_key_arn       = module.kms.key_arns["app"]
-  log_kms_key_arn   = module.kms.key_arns["logs"]
-  private_subnet_ids = module.network.private_subnet_ids
+  name_prefix           = local.name_prefix
+  kms_key_arn           = module.kms.key_arns["app"]
+  log_kms_key_arn       = module.kms.key_arns["logs"]
+  private_subnet_ids    = module.network.private_subnet_ids
   efs_security_group_id = module.network.security_group_ids.efs
-  enable_cloudfront = var.enable_cloudfront
-  tags              = local.common_tags
+  enable_cloudfront     = var.enable_cloudfront
+  tags                  = local.common_tags
 }
 
 module "database" {
-  source = "./database"
+  source = "./modules/database"
 
   name_prefix                = local.name_prefix
   db_name                    = var.db_name
@@ -78,7 +78,7 @@ module "database" {
 }
 
 module "loadbalancers" {
-  source = "./loadbalancers"
+  source = "./modules/loadbalancers"
 
   name_prefix        = local.name_prefix
   vpc_id             = module.network.vpc_id
@@ -88,7 +88,7 @@ module "loadbalancers" {
 }
 
 module "compute" {
-  source = "./compute"
+  source = "./modules/compute"
 
   name_prefix             = local.name_prefix
   instance_type           = var.instance_type
@@ -108,11 +108,11 @@ module "compute" {
 }
 
 module "containers" {
-  source = "./containers"
+  source = "./modules/containers"
 
-  name_prefix           = local.name_prefix
-  private_subnet_ids    = module.network.private_subnet_ids
-  ecs_security_group_id = module.network.security_group_ids.ecs
+  name_prefix             = local.name_prefix
+  private_subnet_ids      = module.network.private_subnet_ids
+  ecs_security_group_id   = module.network.security_group_ids.ecs
   task_execution_role_arn = module.iam.ecs_task_execution_role_arn
   task_role_arn           = module.iam.ecs_task_role_arn
   container_image         = var.container_image
@@ -124,30 +124,30 @@ module "containers" {
 }
 
 module "serverless" {
-  source = "./serverless"
+  source = "./modules/serverless"
 
-  name_prefix           = local.name_prefix
-  enabled               = var.enable_lambda
-  lambda_runtime        = var.lambda_runtime
-  lambda_timeout        = var.lambda_timeout
-  lambda_memory_size    = var.lambda_memory_size
-  log_retention_days    = var.log_retention_days
-  source_bucket_id      = module.storage.bucket_names["artifacts"]
-  source_bucket_arn     = module.storage.bucket_arns["artifacts"]
-  destination_bucket_id = module.storage.bucket_names["app"]
+  name_prefix            = local.name_prefix
+  enabled                = var.enable_lambda
+  lambda_runtime         = var.lambda_runtime
+  lambda_timeout         = var.lambda_timeout
+  lambda_memory_size     = var.lambda_memory_size
+  log_retention_days     = var.log_retention_days
+  source_bucket_id       = module.storage.bucket_names["artifacts"]
+  source_bucket_arn      = module.storage.bucket_arns["artifacts"]
+  destination_bucket_id  = module.storage.bucket_names["app"]
   destination_bucket_arn = module.storage.bucket_arns["app"]
-  kms_key_arn           = module.kms.key_arns["app"]
-  tags                  = local.common_tags
+  kms_key_arn            = module.kms.key_arns["app"]
+  tags                   = local.common_tags
 }
 
 module "monitoring" {
-  source = "./monitoring"
+  source = "./modules/monitoring"
 
-  name_prefix          = local.name_prefix
-  aws_region           = var.aws_region
-  alert_email          = var.alert_email
-  log_retention_days   = var.log_retention_days
-  alb_arn_suffix       = module.loadbalancers.alb_arn_suffix
+  name_prefix                 = local.name_prefix
+  aws_region                  = var.aws_region
+  alert_email                 = var.alert_email
+  log_retention_days          = var.log_retention_days
+  alb_arn_suffix              = module.loadbalancers.alb_arn_suffix
   alb_target_group_arn_suffix = module.loadbalancers.app_target_group_arn_suffix
   autoscaling_group_name      = module.compute.autoscaling_group_name
   rds_instance_id             = module.database.rds_instance_id
@@ -158,14 +158,14 @@ module "monitoring" {
 }
 
 module "dns" {
-  source = "./dns"
+  source = "./modules/dns"
 
-  domain_name         = var.domain_name
-  create_zone         = var.create_route53_zone
-  create_record       = var.create_dns_record
-  alb_dns_name        = module.loadbalancers.alb_dns_name
-  alb_zone_id         = module.loadbalancers.alb_zone_id
-  cloudfront_domain   = module.storage.cloudfront_domain_name
-  cloudfront_zone_id  = module.storage.cloudfront_hosted_zone_id
-  tags                = local.common_tags
+  domain_name        = var.domain_name
+  create_zone        = var.create_route53_zone
+  create_record      = var.create_dns_record
+  alb_dns_name       = module.loadbalancers.alb_dns_name
+  alb_zone_id        = module.loadbalancers.alb_zone_id
+  cloudfront_domain  = module.storage.cloudfront_domain_name
+  cloudfront_zone_id = module.storage.cloudfront_hosted_zone_id
+  tags               = local.common_tags
 }
